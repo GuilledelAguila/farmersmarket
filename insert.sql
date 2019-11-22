@@ -1,1 +1,0 @@
-INSERT INTO TABLE farms (location, farmer)
