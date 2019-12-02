@@ -43,7 +43,7 @@ public class fmgui extends JFrame {
 	private int id_num = 1;
 	
 	
-	public void run() {
+	public void run(Connection conn) {
 		JFrame buyer = new JFrame("buyer");
 		JFrame seller = new JFrame("seller");
 		JFrame farmer = new JFrame("farmer");
@@ -65,7 +65,7 @@ public class fmgui extends JFrame {
 		farmer.setLocation((int)screenWidth / 3 + (int)screenWidth / 3, 0);
 
 		
-		GetTable farms = new GetTable();
+		GetTable farms = new GetTable(conn);
 		JTable farmTable = farms.runTable("select * from farm");
 		
         JScrollPane scrollPane = new JScrollPane(farmTable);
@@ -82,7 +82,7 @@ public class fmgui extends JFrame {
        
         
 // Makes posting table in the buyer window 
-        GetTable posting = new GetTable();
+        GetTable posting = new GetTable(conn);
         JTable postingTable = posting.runTable("SELECT * FROM (SELECT postingid, CONCAT(seller.first_name, \" \", seller.last_name) AS seller_name, \n" + 
             "A.produce_name, courier.courier_type, cost, date_posted FROM posting\n" + 
             "            JOIN seller ON posting.sid = seller.sid\n" + 
@@ -113,7 +113,6 @@ public class fmgui extends JFrame {
                 
                 try {
                   System.out.println("double trouble");
-                 Connection conn = posting.getConnection();
                  CallableStatement callItemBought = conn.prepareCall("{call item_bought(?, ?)}");
                  int dpid = (int) postingTable.getValueAt(postingTable.getSelectedRow(), 0);
                  callItemBought.setInt(1, id_num);
@@ -201,7 +200,10 @@ public class fmgui extends JFrame {
 
 	public static void main(String[] args)  throws Exception {
 		fmgui display = new fmgui();
-
-		display.run();
+		JavaMySql javasql = new JavaMySql();
+		Connection conn = javasql.getConnection();
+		
+		
+		display.run(conn);
 	}
 }

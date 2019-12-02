@@ -20,10 +20,10 @@ import java.util.Scanner;
 public class JavaMySql {
 
 	/** The name of the MySQL account to use (or empty for anonymous) */
-	//private final String userName = "root";
+	private final String userName = "root";
 
 	/** The password for the MySQL account (or empty for anonymous) */
-	//private final String password = "root";
+	private final String password = "root";
 
 	/** The name of the computer running MySQL */
 	private final String serverName = "localhost";
@@ -44,11 +44,11 @@ public class JavaMySql {
 	 * @return
 	 * @throws SQLException
 	 */
-	public Connection getConnection(String user, String pass) throws SQLException {
+	public Connection getConnection() throws SQLException {
 		Connection conn = null;
 		Properties connectionProps = new Properties();
-		connectionProps.put("user", user);
-		connectionProps.put("password", pass);
+		connectionProps.put("user", userName);
+		connectionProps.put("password", password);
 
 		conn = DriverManager.getConnection("jdbc:mysql://"
 				+ this.serverName + ":" + this.portNumber + "/" + this.dbName + "?characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC",
@@ -105,12 +105,12 @@ public class JavaMySql {
 	/**
 	 * Connect to MySQL and do some stuff.
 	 */
-	public void run(String user, String pass) {
+	public void run() {
 
 		// Connect to MySQL
 		Connection conn = null;
 		try {
-			conn = this.getConnection(user, pass);
+			conn = this.getConnection();
 			System.out.println("Connected to database");
 		} catch (SQLException e) {
 			System.out.println("ERROR: Could not connect to the database");
@@ -149,17 +149,17 @@ public class JavaMySql {
 	 */
 	public static void main(String[] args) {
 		// input variables
-		Scanner in = new Scanner(System.in);
-		String user;
-		String pass;
-		System.out.println("Enter username: ");
-		user = in.nextLine();
-		System.out.println("Enter password: ");
-		pass = in.nextLine();
+//		Scanner in = new Scanner(System.in);
+//		String user;
+//		String pass;
+//		System.out.println("Enter username: ");
+//		user = in.nextLine();
+//		System.out.println("Enter password: ");
+//		pass = in.nextLine();
 
 
 		JavaMySql app = new JavaMySql();
-		app.run(user, pass);
+		app.run();
 	}
 }
 
