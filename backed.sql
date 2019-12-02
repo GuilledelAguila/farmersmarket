@@ -74,6 +74,7 @@ DECLARE farm_filter VARCHAR(200);
 DECLARE seller_filter VARCHAR(200);
 DECLARE product_filter VARCHAR(200);
 DECLARE price_filter VARCHAR(200);
+DECLARE not_sold VARCHAR(200);
 DECLARE count INT;
 SET @dynamic_sql = "
     SELECT quantity, CONCAT(first_name, ' ', last_name) AS seller, produce_name AS product, farm_name as farm, cost, date_posted from posting
@@ -81,6 +82,7 @@ SET @dynamic_sql = "
 		NATURAL JOIN seller
 		NATURAL JOIN catalog
 		NATURAL JOIN farm
+        WHERE posting.postingid not in(SELECT DISTINCT postingid from buyer_to_posting)
 	";
 IF farm_name IS NULL AND seller_name IS NULL AND product_name IS NULL AND price_lower IS NULL AND price_upper IS NULL THEN
 	PREPARE search_posting FROM @dynamic_sql;
@@ -147,7 +149,6 @@ ELSE
             SET count = count + 1;
 		END IF; 
 	END IF;
-
     SELECT @dynamic_sql;
 	PREPARE search_posting FROM @dynamic_sql;
 END IF;
@@ -158,3 +159,4 @@ DELIMITER ;
 
 call search_post('Shrute', 'Barack Obama' ,NULL,NULL, NULL);
 call search_post(NULL, NULL ,NULL,NULL, NULL);
+
