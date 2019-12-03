@@ -42,6 +42,33 @@ public class fmgui extends JFrame {
 	
 	private int id_num = 1;
 	
+	public JTable refreshtable(Connection conn, JFrame buyer) {
+		GetTable posting = new GetTable(conn);
+        JTable postingTable = posting.runTable("SELECT * FROM (SELECT postingid, CONCAT(seller.first_name, \" \", seller.last_name) AS seller_name, \n" + 
+            "A.produce_name, courier.courier_type, cost, date_posted FROM posting\n" + 
+            "            JOIN seller ON posting.sid = seller.sid\n" + 
+            "            JOIN (SELECT pid, produce_name FROM produce \n" + 
+            "            JOIN catalog ON produce.cid = catalog.cid) AS A\n" + 
+            "      ON posting.pid = A.pid\n" + 
+            "            JOIN courier ON posting.courid = courier.courid \n" + 
+            "            ORDER BY date_posted) AS B\n" + 
+            "            WHERE postingid NOT IN (SELECT DISTINCT postingid FROM buyer_to_posting);");
+        
+            JScrollPane pScrollPane = new JScrollPane(postingTable);
+            postingTable.setFillsViewportHeight(true);
+     
+            JLabel pLblHeading = new JLabel("Postings");
+     
+            buyer.getContentPane().setLayout(new BorderLayout());
+     
+            buyer.getContentPane().add(pLblHeading,BorderLayout.PAGE_START);
+            buyer.getContentPane().add(pScrollPane,BorderLayout.CENTER);
+     
+            buyer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            
+            return postingTable;
+	}
+	
 	
 	public void run(Connection conn) {
 		JFrame buyer = new JFrame("buyer");
@@ -82,37 +109,19 @@ public class fmgui extends JFrame {
        
         
 // Makes posting table in the buyer window 
-        GetTable posting = new GetTable(conn);
-        JTable postingTable = posting.runTable("SELECT * FROM (SELECT postingid, CONCAT(seller.first_name, \" \", seller.last_name) AS seller_name, \n" + 
-            "A.produce_name, courier.courier_type, cost, date_posted FROM posting\n" + 
-            "            JOIN seller ON posting.sid = seller.sid\n" + 
-            "            JOIN (SELECT pid, produce_name FROM produce \n" + 
-            "            JOIN catalog ON produce.cid = catalog.cid) AS A\n" + 
-            "      ON posting.pid = A.pid\n" + 
-            "            JOIN courier ON posting.courid = courier.courid \n" + 
-            "            ORDER BY date_posted) AS B\n" + 
-            "            WHERE postingid NOT IN (SELECT DISTINCT postingid FROM buyer_to_posting);");
         
-            JScrollPane pScrollPane = new JScrollPane(postingTable);
-            postingTable.setFillsViewportHeight(true);
-     
-            JLabel pLblHeading = new JLabel("Postings");
-     
-            buyer.getContentPane().setLayout(new BorderLayout());
-     
-            buyer.getContentPane().add(pLblHeading,BorderLayout.PAGE_START);
-            buyer.getContentPane().add(pScrollPane,BorderLayout.CENTER);
-     
-            buyer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            
+        	JTable postingTable = this.refreshtable(conn, buyer);
+
             // allows for selection of row from a table
             postingTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
               public void valueChanged(ListSelectionEvent event) {
+
+            	 if  (event.getValueIsAdjusting() ){
                 
                   // need to add something that will trigger updates either here or SQL
                 
                 try {
-                  System.out.println("double trouble");
+                 System.out.println("double trouble");
                  CallableStatement callItemBought = conn.prepareCall("{call item_bought(?, ?)}");
                  int dpid = (int) postingTable.getValueAt(postingTable.getSelectedRow(), 0);
                  callItemBought.setInt(1, id_num);
@@ -129,11 +138,13 @@ public class fmgui extends JFrame {
                   // TODO Auto-generated catch block
                   e.printStackTrace();
                 } 
+            	  }
             
                 
                 // System.out.println(postingTable.getValueAt(postingTable.getSelectedRow(), 0).toString());
               }
           });
+            
 /*
             // create a label to display text 
             JLabel l = new JLabel("nothing entered"); 
@@ -190,10 +201,10 @@ public class fmgui extends JFrame {
 // 
 //        farmer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-        
-		buyer.setVisible(true);
-		seller.setVisible(true);
-		farmer.setVisible(true);
+    		buyer.setVisible(true);
+    		seller.setVisible(true);
+    		farmer.setVisible(true);
+
 	}
 	
 	
