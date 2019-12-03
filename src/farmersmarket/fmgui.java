@@ -16,6 +16,7 @@ import java.util.Properties;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 
 public class fmgui extends JFrame {
@@ -41,34 +42,7 @@ public class fmgui extends JFrame {
 	private final String dbName = "farmersmarket";
 	
 	private int id_num = 1;
-	
-	public JTable refreshtable(Connection conn, JFrame buyer) {
-		GetTable posting = new GetTable(conn);
-        JTable postingTable = posting.runTable("SELECT * FROM (SELECT postingid, CONCAT(seller.first_name, \" \", seller.last_name) AS seller_name, \n" + 
-            "A.produce_name, courier.courier_type, cost, date_posted FROM posting\n" + 
-            "            JOIN seller ON posting.sid = seller.sid\n" + 
-            "            JOIN (SELECT pid, produce_name FROM produce \n" + 
-            "            JOIN catalog ON produce.cid = catalog.cid) AS A\n" + 
-            "      ON posting.pid = A.pid\n" + 
-            "            JOIN courier ON posting.courid = courier.courid \n" + 
-            "            ORDER BY date_posted) AS B\n" + 
-            "            WHERE postingid NOT IN (SELECT DISTINCT postingid FROM buyer_to_posting);");
-        
-            JScrollPane pScrollPane = new JScrollPane(postingTable);
-            postingTable.setFillsViewportHeight(true);
-     
-            JLabel pLblHeading = new JLabel("Postings");
-     
-            buyer.getContentPane().setLayout(new BorderLayout());
-     
-            buyer.getContentPane().add(pLblHeading,BorderLayout.PAGE_START);
-            buyer.getContentPane().add(pScrollPane,BorderLayout.CENTER);
-     
-            buyer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            
-            return postingTable;
-	}
-	
+
 	
 	public void run(Connection conn) {
 		JFrame buyer = new JFrame("buyer");
@@ -110,7 +84,28 @@ public class fmgui extends JFrame {
         
 // Makes posting table in the buyer window 
         
-        	JTable postingTable = this.refreshtable(conn, buyer);
+		GetTable posting = new GetTable(conn);
+        JTable postingTable = posting.runTable("SELECT * FROM (SELECT postingid, CONCAT(seller.first_name, \" \", seller.last_name) AS seller_name, \n" + 
+            "A.produce_name, courier.courier_type, cost, date_posted FROM posting\n" + 
+            "            JOIN seller ON posting.sid = seller.sid\n" + 
+            "            JOIN (SELECT pid, produce_name FROM produce \n" + 
+            "            JOIN catalog ON produce.cid = catalog.cid) AS A\n" + 
+            "      ON posting.pid = A.pid\n" + 
+            "            JOIN courier ON posting.courid = courier.courid \n" + 
+            "            ORDER BY date_posted) AS B\n" + 
+            "            WHERE postingid NOT IN (SELECT DISTINCT postingid FROM buyer_to_posting);");
+        
+            JScrollPane pScrollPane = new JScrollPane(postingTable);
+            postingTable.setFillsViewportHeight(true);
+     
+            JLabel pLblHeading = new JLabel("Postings");
+     
+            buyer.getContentPane().setLayout(new BorderLayout());
+     
+            buyer.getContentPane().add(pLblHeading,BorderLayout.PAGE_START);
+            buyer.getContentPane().add(pScrollPane,BorderLayout.CENTER);
+     
+            buyer.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
             // allows for selection of row from a table
             postingTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
@@ -127,21 +122,22 @@ public class fmgui extends JFrame {
                  callItemBought.setInt(1, id_num);
                  callItemBought.setInt(2, dpid);
                  callItemBought.execute();
-                 
-                 //String sql = "DELETE FROM posting WHERE pid = " + dpid;
-                // JavaMySql jms = new JavaMySql();
-                // jms.executeUpdate(conn, sql);
-                // CallableStatement callDelete = conn.prepareCall("DELETE FROM buyer WHERE)
+                 try {
+                	 ((DefaultTableModel)postingTable.getModel()).removeRow(postingTable.getSelectedRow());
+                 } catch (ArrayIndexOutOfBoundsException e) {
+                	 
+                 }
+
+                 buyer.repaint();
+              
                  
                 }
                 catch (SQLException e) {
                   // TODO Auto-generated catch block
                   e.printStackTrace();
                 } 
-            	  }
-            
-                
-                // System.out.println(postingTable.getValueAt(postingTable.getSelectedRow(), 0).toString());
+
+            	 }
               }
           });
             
