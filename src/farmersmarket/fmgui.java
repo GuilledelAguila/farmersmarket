@@ -8,6 +8,7 @@ import java.awt.event.MouseListener;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -42,9 +43,13 @@ public class fmgui extends JFrame {
 	private final String dbName = "farmersmarket";
 	
 	private int id_num = 1;
+	
+	public void fetch() {
+		String a;
+	}
 
 	
-	public void run(Connection conn) {
+	public void run(Connection conn) throws SQLException {
 		JFrame buyer = new JFrame("buyer");
 		JFrame seller = new JFrame("seller");
 		JFrame farmer = new JFrame("farmer");
@@ -85,6 +90,7 @@ public class fmgui extends JFrame {
 // Makes posting table in the buyer window 
         
 		GetTable posting = new GetTable(conn);
+				
         JTable postingTable = posting.runTable("SELECT * FROM (SELECT postingid, CONCAT(seller.first_name, \" \", seller.last_name) AS seller_name, \n" + 
             "A.produce_name, courier.courier_type, cost, date_posted FROM posting\n" + 
             "            JOIN seller ON posting.sid = seller.sid\n" + 
@@ -118,17 +124,33 @@ public class fmgui extends JFrame {
                 try {
                  System.out.println("double trouble");
                  CallableStatement callItemBought = conn.prepareCall("{call item_bought(?, ?)}");
+                 if (postingTable.getSelectedRow() != -1) {
                  int dpid = (int) postingTable.getValueAt(postingTable.getSelectedRow(), 0);
                  callItemBought.setInt(1, id_num);
                  callItemBought.setInt(2, dpid);
                  callItemBought.execute();
-                 try {
-                	 ((DefaultTableModel)postingTable.getModel()).removeRow(postingTable.getSelectedRow());
-                 } catch (ArrayIndexOutOfBoundsException e) {
-                	 
+                 
+		         		String q = "SELECT * FROM (SELECT postingid, CONCAT(seller.first_name, \" \", seller.last_name) AS seller_name, \n" + 
+		 	            "A.produce_name, courier.courier_type, cost, date_posted FROM posting\n" + 
+		 	            "            JOIN seller ON posting.sid = seller.sid\n" + 
+		 	            "            JOIN (SELECT pid, produce_name FROM produce \n" + 
+		 	            "            JOIN catalog ON produce.cid = catalog.cid) AS A\n" + 
+		 	            "      ON posting.pid = A.pid\n" + 
+		 	            "            JOIN courier ON posting.courid = courier.courid \n" + 
+		 	            "            ORDER BY date_posted) AS B\n" + 
+		 	            "            WHERE postingid NOT IN (SELECT DISTINCT postingid FROM buyer_to_posting);";
+		 		
+		 		PreparedStatement pst = conn.prepareStatement(q);
+		 	    try {
+		 			ResultSet s = pst.executeQuery(q);
+		 			postingTable.setModel(posting.buildTableModel(s));
+		 	    } finally {
+		 			pst.close();
+		 	    }
                  }
+                 
 
-                 buyer.repaint();
+    //             buyer.repaint();
               
                  
                 }
