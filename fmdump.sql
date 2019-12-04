@@ -56,8 +56,8 @@ CREATE TABLE `buyer_to_posting` (
   `date_sold` date NOT NULL,
   PRIMARY KEY (`bid`,`postingid`),
   KEY `buyer_to_posting_fk_posting` (`postingid`),
-  CONSTRAINT `buyer_to_posting_fk_buyer` FOREIGN KEY (`bid`) REFERENCES `buyer` (`bid`),
-  CONSTRAINT `buyer_to_posting_fk_posting` FOREIGN KEY (`postingid`) REFERENCES `posting` (`postingid`)
+  CONSTRAINT `buyer_to_posting_fk_buyer` FOREIGN KEY (`bid`) REFERENCES `buyer` (`bid`) ON DELETE RESTRICT,
+  CONSTRAINT `buyer_to_posting_fk_posting` FOREIGN KEY (`postingid`) REFERENCES `posting` (`postingid`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -165,9 +165,9 @@ CREATE TABLE `posting` (
   UNIQUE KEY `unique_sid_pid` (`sid`,`pid`),
   KEY `posting_fk_produce` (`pid`),
   KEY `posting_fk_courier` (`courid`),
-  CONSTRAINT `posting_fk_courier` FOREIGN KEY (`courid`) REFERENCES `courier` (`courid`),
-  CONSTRAINT `posting_fk_produce` FOREIGN KEY (`pid`) REFERENCES `produce` (`pid`),
-  CONSTRAINT `posting_fk_seller` FOREIGN KEY (`sid`) REFERENCES `seller` (`sid`)
+  CONSTRAINT `posting_fk_courier` FOREIGN KEY (`courid`) REFERENCES `courier` (`courid`) ON DELETE RESTRICT,
+  CONSTRAINT `posting_fk_produce` FOREIGN KEY (`pid`) REFERENCES `produce` (`pid`) ON DELETE RESTRICT,
+  CONSTRAINT `posting_fk_seller` FOREIGN KEY (`sid`) REFERENCES `seller` (`sid`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -196,8 +196,8 @@ CREATE TABLE `produce` (
   PRIMARY KEY (`pid`),
   KEY `produce_fk_catalog` (`cid`),
   KEY `produce_fk_farm` (`fid`),
-  CONSTRAINT `produce_fk_catalog` FOREIGN KEY (`cid`) REFERENCES `catalog` (`cid`),
-  CONSTRAINT `produce_fk_farm` FOREIGN KEY (`fid`) REFERENCES `farm` (`fid`)
+  CONSTRAINT `produce_fk_catalog` FOREIGN KEY (`cid`) REFERENCES `catalog` (`cid`) ON DELETE RESTRICT,
+  CONSTRAINT `produce_fk_farm` FOREIGN KEY (`fid`) REFERENCES `farm` (`fid`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -226,8 +226,8 @@ CREATE TABLE `review` (
   PRIMARY KEY (`rid`),
   KEY `review_fk_buyer` (`bid`),
   KEY `review_fk_farm` (`fid`),
-  CONSTRAINT `review_fk_buyer` FOREIGN KEY (`bid`) REFERENCES `buyer` (`bid`),
-  CONSTRAINT `review_fk_farm` FOREIGN KEY (`fid`) REFERENCES `farm` (`fid`)
+  CONSTRAINT `review_fk_buyer` FOREIGN KEY (`bid`) REFERENCES `buyer` (`bid`) ON DELETE RESTRICT,
+  CONSTRAINT `review_fk_farm` FOREIGN KEY (`fid`) REFERENCES `farm` (`fid`) ON DELETE RESTRICT
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -302,4 +302,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-11-21 19:25:36
+-- Dump completed on 2019-12-04 17:45:47
