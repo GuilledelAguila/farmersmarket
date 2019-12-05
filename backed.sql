@@ -160,3 +160,30 @@ DELIMITER ;
 call search_post('Shrute', 'Barack Obama' ,NULL,NULL, NULL);
 call search_post(NULL, NULL ,NULL,NULL, NULL);
 
+-- updates seller_to_farm table after a seller partners with a farmer
+
+DELIMITER //
+CREATE PROCEDURE farmer_partner(
+    IN sid INT,
+    IN fid INT
+)
+BEGIN
+INSERT INTO seller_to_farm VALUES (sid, fid);
+END //
+DELIMITER ;
+
+CALL farmer_partner(3, 1);
+
+-- deletes a posting
+
+DELIMITER //
+CREATE PROCEDURE delete_posting(
+	IN postid INT
+)
+BEGIN
+DELETE FROM posting WHERE postingid = postid;
+END //
+DELIMITER ;
+
+CALL delete_posting(10);
+
