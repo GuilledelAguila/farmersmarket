@@ -59,16 +59,18 @@ public class Farmer {
 		farmer.add(reveiwsButton);
 
 		// ActionListeners for buttons
+
+		// reviews button
 		reveiwsButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
+
 				String reviewQuery = "SELECT review, bid FROM review WHERE fid = " + id + "";
-				
+
 				ArrayList<String> reviewsText = new ArrayList<String>();
 				// ArrayList<Integer> whoSaidIds = new ArrayList<Integer>();
-				
+
 				try(PreparedStatement ps = conn.prepareStatement(reviewQuery);
 						ResultSet rs = ps.executeQuery()) {
 					while(rs.next()) {
@@ -77,15 +79,15 @@ public class Farmer {
 				} catch (SQLException e1) {
 					System.out.println(e1.getMessage());
 				}
-				
+
 				String allReviews = "";
-				
+
 				for (String s : reviewsText) {
 					allReviews += s + "\n";
 				}
-				
+
 				// String whoSaidReview = "SELECT first_name, last_name FROM review WHERE " + whoSaid + " = bid";
-				
+
 
 				JTextArea reviews = new JTextArea(allReviews);
 				reviews.setFont(new Font("Serif", Font.ITALIC, 16));
@@ -96,7 +98,7 @@ public class Farmer {
 				reviews.setSize((int)screenWidth / 3 - 200, (int)screenHeight / 3 - 200);
 
 				panel.add(reviews);
-				
+
 				farmer.add(panel);
 
 				panel.revalidate();
@@ -105,24 +107,27 @@ public class Farmer {
 
 		});
 
+		// see produce button
+		seeProduceButton.addActionListener(new ActionListener() {
 
+			@Override
+			public void actionPerformed(ActionEvent e) {
 
+				GetTable farms = new GetTable(conn);
+				JTable farmTable = farms.runTable("SELECT postingid, produce_name, c.sid, CONCAT(first_name, ' ', last_name) AS seller_name FROM (SELECT postingid, produce_name, sid FROM (SELECT postingid, a.cid AS catalogid, sid FROM posting JOIN (SELECT pid, cid FROM produce WHERE fid = 3) as a WHERE posting.pid = a.pid) as b JOIN catalog WHERE catalogid = catalog.cid) as c JOIN seller WHERE seller.sid = c.sid;");
 
-		// All farm data
-		/*
-		GetTable farms = new GetTable(conn);
-		JTable farmTable = farms.runTable("select * from farm");
+				JScrollPane scrollPane = new JScrollPane(farmTable);
+				farmTable.setFillsViewportHeight(true);
 
-        JScrollPane scrollPane = new JScrollPane(farmTable);
-        farmTable.setFillsViewportHeight(true);
+				JLabel lblHeading = new JLabel("Farms");
 
-        JLabel lblHeading = new JLabel("Farms");
+				farmer.getContentPane().setLayout(new BorderLayout());
 
-        farmer.getContentPane().setLayout(new BorderLayout());
+				farmer.getContentPane().add(lblHeading,BorderLayout.PAGE_START);
+				farmer.getContentPane().add(scrollPane,BorderLayout.CENTER);
+			}
 
-        farmer.getContentPane().add(lblHeading,BorderLayout.PAGE_START);
-        farmer.getContentPane().add(scrollPane,BorderLayout.CENTER);
-		 */
+		});
 
 
 
