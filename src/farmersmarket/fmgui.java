@@ -1,28 +1,17 @@
 package farmersmarket;
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
-import java.awt.event.WindowEvent;
-import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 public class fmgui extends JFrame {
 
@@ -90,6 +79,7 @@ public class fmgui extends JFrame {
 
 		// Waits for role input to display possible ID's as a dropdown
 		// Locks the combobox to select a role after first selection
+		// Opens corresponding window on second selection
 		cb.addActionListener(new ActionListener() {
 
 			@Override
@@ -328,7 +318,11 @@ public class fmgui extends JFrame {
 		Connection conn = javasql.getConnection();
 
 		// run login
-		display.runStartWindow(conn);
+		//display.runStartWindow(conn);
+		
+		// for testing farmer
+		Farmer f = new Farmer();
+		f.run(conn, 8);
 
 	}
 }
