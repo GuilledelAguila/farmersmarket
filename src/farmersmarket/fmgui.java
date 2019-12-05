@@ -1,26 +1,17 @@
 package farmersmarket;
-import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseListener;
-import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Properties;
+import java.util.Vector;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 
 public class fmgui extends JFrame {
 
@@ -37,13 +28,17 @@ public class fmgui extends JFrame {
 
 	//prompt user for ID
 	// must be a pre-existing user
-	public int runStartWindow(Connection conn) throws SQLException {
-		
-		String buyerQuery = "SELECT bid FROM buyer";
-		String sellerQuery = "SELECT sid FROM buyer";
-		String farmerQuery = "SELECT fid FROM buyer";
+	public int[] runStartWindow(Connection conn) throws SQLException {
 
-		int result = 0;
+		Buyer b = new Buyer();
+		Seller s = new Seller();
+		Farmer f = new Farmer();
+
+		String buyerQuery = "SELECT bid FROM buyer";
+		String sellerQuery = "SELECT sid FROM seller";
+		String farmerQuery = "SELECT fid FROM farm";
+
+		int result[] = { 0, 0 };
 
 		// Login Frame
 		JFrame login = new JFrame("Login");
@@ -77,26 +72,235 @@ public class fmgui extends JFrame {
 		JLabel enterID = new JLabel("Enter your ID: ");
 		enterID.setAlignmentX(Component.CENTER_ALIGNMENT);
 		panel.add(enterID);
-		
-		
-		String role = cb.getSelectedItem().toString();
-		System.out.println(role);
-		
-		// Dropdown for ID
-		int ids[];
-		
-		switch(role) {
-		case "BUYER": break;
-		case "SELLER": break;
-		case "FARMER": break;
-		default: break;
-		}
-		
 
-		// Enter button
-		JButton btn = new JButton("Enter");
-		btn.setAlignmentX(Component.CENTER_ALIGNMENT);
-		panel.add(btn);
+		// Dropdown for ID
+		Vector<Integer> ids = new Vector<Integer>();
+
+
+		// Waits for role input to display possible ID's as a dropdown
+		// Locks the combobox to select a role after first selection
+		// Opens corresponding window on second selection
+		cb.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String role = cb.getSelectedItem().toString();
+
+				switch(role) {
+				case "BUYER": 
+					try(PreparedStatement ps = conn.prepareStatement(buyerQuery);
+							ResultSet rs = ps.executeQuery()) {
+						while(rs.next()) {
+							ids.add(rs.getInt("bid"));
+						}
+					} catch (SQLException e) {
+						System.out.println(e.getMessage());
+					}
+
+					// make the combobox
+					JComboBox<Integer> cb1 = new JComboBox<Integer>(ids);
+					cb1.setMaximumSize(cb1.getPreferredSize());
+					cb1.setAlignmentX(Component.CENTER_ALIGNMENT);
+					panel.add(cb1, 4);
+
+					cb.setEnabled(false);
+
+					cb1.addActionListener(new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+
+							String userString = cb.getSelectedItem().toString();
+
+							switch(userString) {
+							case "BUYER": result[0] = 1; break;
+							case "SELLER": result[0] = 2; break;
+							case "FARMER": result[0] = 3; break;
+							default: break;
+							}
+
+							result[1] = (int)cb1.getSelectedItem();
+
+							cb1.setEnabled(false);
+
+							// switch for each window based on role: BUYER, SELLER, or FARMER
+							switch(result[0]) {
+							case 1: try {
+								login.dispose();
+								b.run(conn, result[1]);
+							} catch (SQLException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							} break;
+							case 2: try {
+								s.run(conn, result[1]);
+								login.dispose();
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} break;
+							case 3: try {
+								f.run(conn, result[1]);
+								login.dispose();
+							} catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} break;
+							default: break;
+							}
+						}
+					});
+
+					login.add(panel);
+
+					panel.revalidate();
+					panel.repaint();
+
+
+					break;
+				case "SELLER": 
+					try(PreparedStatement ps1 = conn.prepareStatement(sellerQuery);
+							ResultSet rs1 = ps1.executeQuery()) {
+						while(rs1.next()) {
+							ids.add(rs1.getInt("sid"));
+						}
+					} catch (SQLException e) {
+						System.out.println(e.getMessage());
+					}
+
+					// make the combobox
+					cb1 = new JComboBox<Integer>(ids);
+					cb1.setMaximumSize(cb1.getPreferredSize());
+					cb1.setAlignmentX(Component.CENTER_ALIGNMENT);
+					panel.add(cb1, 4);
+
+					cb.setEnabled(false);
+
+					cb1.addActionListener(new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+
+							String userString = cb.getSelectedItem().toString();
+
+							switch(userString) {
+							case "BUYER": result[0] = 1; break;
+							case "SELLER": result[0] = 2; break;
+							case "FARMER": result[0] = 3; break;
+							default: break;
+							}
+
+							result[1] = (int)cb1.getSelectedItem();
+
+							cb1.setEnabled(false);
+
+							// switch for each window based on role: BUYER, SELLER, or FARMER
+							switch(result[0]) {
+							case 1: try {
+								b.run(conn, result[1]);
+								login.dispose();
+							} catch (SQLException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							} break;
+							case 2: try {
+								s.run(conn, result[1]);
+								login.dispose();
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} break;
+							case 3: try {
+								f.run(conn, result[1]);
+								login.dispose();
+							} catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} break;
+							default: break;
+							}
+						}
+					});
+
+					login.add(panel);
+
+					panel.revalidate();
+					panel.repaint();
+
+					break;
+				case "FARMER": 
+					try(PreparedStatement ps2 = conn.prepareStatement(farmerQuery);
+							ResultSet rs2 = ps2.executeQuery()) {
+						while(rs2.next()) {
+							ids.add(rs2.getInt("fid"));
+						}
+					} catch (SQLException e) {
+						System.out.println(e.getMessage());
+					}
+
+					// make the combobox
+					cb1 = new JComboBox<Integer>(ids);
+					cb1.setMaximumSize(cb1.getPreferredSize());
+					cb1.setAlignmentX(Component.CENTER_ALIGNMENT);
+					panel.add(cb1, 4);
+
+					cb.setEnabled(false);
+
+					cb1.addActionListener(new ActionListener() {
+
+						@Override
+						public void actionPerformed(ActionEvent arg0) {
+
+							String userString = cb.getSelectedItem().toString();
+
+							switch(userString) {
+							case "BUYER": result[0] = 1; break;
+							case "SELLER": result[0] = 2; break;
+							case "FARMER": result[0] = 3; break;
+							default: break;
+							}
+
+							result[1] = (int)cb1.getSelectedItem();
+
+							cb1.setEnabled(false);
+
+							// switch for each window based on role: BUYER, SELLER, or FARMER
+							switch(result[0]) {
+							case 1: try {
+								b.run(conn, result[1]);
+								login.dispose();
+							} catch (SQLException e2) {
+								// TODO Auto-generated catch block
+								e2.printStackTrace();
+							} break;
+							case 2: try {
+								s.run(conn, result[1]);
+								login.dispose();
+							} catch (SQLException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							} break;
+							case 3: try {
+								f.run(conn, result[1]);
+								login.dispose();
+							} catch (SQLException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} break;
+							default: break;
+							}
+						}
+					});
+
+					panel.revalidate();
+					panel.repaint();
+
+
+					break;
+				default: break;
+				}
+			}
+		});
 
 		// Add the panel
 		login.add(panel);
@@ -112,21 +316,13 @@ public class fmgui extends JFrame {
 		JavaMySql javasql = new JavaMySql();
 		// set the connection to Database
 		Connection conn = javasql.getConnection();
-		Buyer b = new Buyer();
-		Seller s = new Seller();
+
+		// run login
+		//display.runStartWindow(conn);
+		
+		// for testing farmer
 		Farmer f = new Farmer();
-
-		// gets the id
-		int id  = display.runStartWindow(conn);
-
-
-		// switch for each window based on role: BUYER, SELLER, or FARMER
-		switch(id) {
-		case 1: b.run(conn, id); break;
-		case 2: s.run(conn, id); break;
-		case 3: f.run(conn, id); break;
-		default: break;
-		}
+		f.run(conn, 8);
 
 	}
 }

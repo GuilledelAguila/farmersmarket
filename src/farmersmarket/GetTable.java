@@ -1,12 +1,11 @@
 package farmersmarket;
-import java.awt.BorderLayout;
 import java.sql.*;
-import java.util.Properties;
 import java.util.Vector;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
+// Gets the JTable from the database given a query
 class GetTable {
 	
 	GetTable(Connection conn) {
@@ -72,9 +71,5 @@ class GetTable {
         table.setFillsViewportHeight(true);
         
         return table;
-		// Closes the Connection
-
-		//JOptionPane.showMessageDialog(null, new JScrollPane(table));
-
 	}
 }
