@@ -2,7 +2,7 @@
 -- BUYER BUYS A CERTAIN POST:
 USE farmersmarket;
 DELIMITER //
-
+DROP PROCEDURE item_bought;
 CREATE PROCEDURE item_bought(
     IN bid INT,
     IN postingid INT
@@ -12,7 +12,7 @@ INSERT INTO buyer_to_posting VALUES (bid, postingid, curdate());
 END //
 DELIMITER ;
 
-call item_bought(1,2);
+-- call item_bought(1,2);
 
 select * from buyer_to_posting;
 
@@ -36,16 +36,16 @@ DELIMITER ;
 
 call buyer_history(1);
 
--- BUYER WANTS TO SEE THEIR BUYING HISTORY
+-- FARMER WANTS TO SEE THEIR PRODUCE HISTORY
 
 DELIMITER //
-DROP PROCEDURE buyer_history;
-CREATE PROCEDURE buyer_history(
+DROP PROCEDURE farmer_history;
+CREATE PROCEDURE farmer_history(
     IN inbid INT
 )
 BEGIN
-SELECT date_sold AS date, quantity, CONCAT(first_name, ' ', last_name) AS seller, produce_name AS product, farm_name as farm
- FROM (SELECT * FROM buyer_to_posting WHERE bid = inbid) a
+SELECT pid, produce_name,  sid, CONCAT(first_name, ' ', last_name) AS seller
+	FROM (SELECT * FROM farm WHERE fid = inbid) a
 NATURAL JOIN posting
 NATURAL JOIN produce
 NATURAL JOIN seller
@@ -54,7 +54,7 @@ NATURAL JOIN farm;
 END //
 DELIMITER ;
 
-call buyer_history(1);
+call farmer_history(8);
 
 -- BUYER WANTS TO SEARCH FOR POSTINGS WITH FILTERS
 
