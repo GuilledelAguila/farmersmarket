@@ -119,12 +119,13 @@ public class Farmer {
 				JScrollPane scrollPane = new JScrollPane(farmTable);
 				farmTable.setFillsViewportHeight(true);
 
-				JLabel lblHeading = new JLabel("Farms");
+				
+				panel.add(farmTable);
+				
+				farmer.add(panel);
 
-				farmer.getContentPane().setLayout(new BorderLayout());
-
-				farmer.getContentPane().add(lblHeading,BorderLayout.PAGE_START);
-				farmer.getContentPane().add(scrollPane,BorderLayout.CENTER);
+				panel.revalidate();
+				panel.repaint();
 			}
 
 		});
