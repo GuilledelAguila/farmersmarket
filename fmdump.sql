@@ -189,7 +189,7 @@ DROP TABLE IF EXISTS `produce`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `produce` (
-  `pid` int(11) NOT NULL,
+  `pid` int(11) NOT NULL AUTO_INCREMENT,
   `quantity` int(11) NOT NULL,
   `cid` int(11) NOT NULL,
   `fid` int(11) NOT NULL,

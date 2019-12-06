@@ -185,4 +185,25 @@ DELETE FROM posting WHERE postingid = postid;
 END //
 DELIMITER ;
 
+-- add a produce
+DROP PROCEDURE add_produce;
+DELIMITER //
+CREATE PROCEDURE add_produce(
+	IN quantityIN INT,
+    IN cidIN INT,
+    IN fidIN INT
+)
+DETERMINISTIC
+MODIFIES SQL DATA
+BEGIN
+    INSERT INTO produce
+    SET 
+    pid = DEFAULT,
+    quantity = quantityIN,
+    cid = cidIN,
+    fid = fidIN;
+END //
+DELIMITER ;
+
+call add_produce(12, 3, 3);
 

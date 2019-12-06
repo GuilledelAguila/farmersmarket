@@ -1,4 +1,5 @@
 package farmersmarket;
+
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -322,7 +323,7 @@ public class fmgui extends JFrame {
 		
 		// for testing farmer
 		Farmer f = new Farmer();
-		f.run(conn, 8);
+		f.run(conn, 4);
 
 	}
 }
