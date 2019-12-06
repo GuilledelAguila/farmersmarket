@@ -309,20 +309,15 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `add_posting`(
 	IN costIN INT,
     IN sidIN INT,
-    IN pidIN INT,
-    IN cidIN INT
+    IN produce_nameIN VARCHAR(50),
+    IN courier_nameIN VARCHAR(50)
 )
     MODIFIES SQL DATA
     DETERMINISTIC
 BEGIN
 
-    INSERT INTO posting
-    SET 
-    postingid = DEFAULT,
-    sid = sidIN,
-    cost = costIN,
-    pid = pidIN,
-    cid = cidIN;
+INSERT INTO posting values(DEFAULT, sidIN, pidIN, cidIN, costIN, curdate()); 
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
