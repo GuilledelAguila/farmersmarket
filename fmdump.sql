@@ -448,7 +448,7 @@ BEGIN
 
 SELECT postingid, produce_name, c.sid, CONCAT(first_name, ' ', last_name) AS seller_name 
 FROM (SELECT postingid, produce_name, sid FROM (SELECT postingid, a.cid AS catalogid, sid 
-FROM posting JOIN (SELECT pid, cid FROM produce WHERE fid = fdiIN) as a
+FROM posting JOIN (SELECT pid, cid FROM produce WHERE fid = fidIN) as a
  WHERE posting.pid = a.pid) as b JOIN catalog WHERE catalogid = catalog.cid) as c JOIN seller WHERE seller.sid = c.sid;
 
 END ;;
