@@ -319,11 +319,11 @@ public class fmgui extends JFrame {
 		Connection conn = javasql.getConnection();
 
 		// run login
-		//display.runStartWindow(conn);
+		display.runStartWindow(conn);
 		
 		// for testing farmer
-		Farmer f = new Farmer();
-		f.run(conn, 4);
+//		Farmer f = new Farmer();
+//		f.run(conn, 4);
 
 	}
 }
