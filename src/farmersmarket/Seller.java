@@ -256,7 +256,7 @@ public class Seller {
              // need to add something that will trigger updates either here or SQL
 
              try {
-               CallableStatement callItemBought = conn.prepareCall("{delete_posting(?)}");
+               CallableStatement callItemBought = conn.prepareCall("{call delete_posting(?)}");
                if (farmersTable.getSelectedRow() != -1) {
                  int postid = (int) farmersTable.getValueAt(farmersTable.getSelectedRow(), 0);
                  callItemBought.setInt(1, postid);

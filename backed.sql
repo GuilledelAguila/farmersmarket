@@ -1,8 +1,8 @@
 -- USER ACTIONS:
 -- BUYER BUYS A CERTAIN POST:
 USE farmersmarket;
-DELIMITER //
 DROP PROCEDURE item_bought;
+DELIMITER //
 CREATE PROCEDURE item_bought(
     IN bid INT,
     IN postingid INT
@@ -18,8 +18,8 @@ select * from buyer_to_posting;
 
 -- BUYER WANTS TO SEE THEIR BUYING HISTORY
 
-DELIMITER //
 DROP PROCEDURE buyer_history;
+DELIMITER //
 CREATE PROCEDURE buyer_history(
     IN inbid INT
 )
@@ -38,8 +38,8 @@ call buyer_history(1);
 
 -- FARMER WANTS TO SEE THEIR PRODUCE HISTORY
 
-DELIMITER //
 DROP PROCEDURE farmer_history;
+DELIMITER //
 CREATE PROCEDURE farmer_history(
     IN inbid INT
 )
@@ -162,6 +162,7 @@ call search_post(NULL, NULL ,NULL,NULL, NULL);
 
 -- updates seller_to_farm table after a seller partners with a farmer
 
+DROP PROCEDURE farmer_partner;
 DELIMITER //
 CREATE PROCEDURE farmer_partner(
     IN sid INT,
@@ -172,10 +173,9 @@ INSERT INTO seller_to_farm VALUES (sid, fid);
 END //
 DELIMITER ;
 
-CALL farmer_partner(3, 1);
-
 -- deletes a posting
 
+DROP PROCEDURE delete_posting;
 DELIMITER //
 CREATE PROCEDURE delete_posting(
 	IN postid INT
@@ -185,5 +185,4 @@ DELETE FROM posting WHERE postingid = postid;
 END //
 DELIMITER ;
 
-CALL delete_posting(10);
 
