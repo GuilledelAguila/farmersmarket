@@ -316,7 +316,7 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `add_posting`(
     DETERMINISTIC
 BEGIN
 
-    INSERT INTO produce
+    INSERT INTO posting
     SET 
     postingid = DEFAULT,
     sid = sidIN,
