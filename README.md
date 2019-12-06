@@ -22,4 +22,4 @@ Setting Connection with Database:
 1. Inside JavaMySql.java, set userName, password, serverName, and portNumber variables to the respective values to your MySQL account.
 
 ## UML
-![Screenshot](farmersmarketUML.jpeg)
+![Screenshot](uml.jpeg)
