@@ -3,7 +3,6 @@
 USE farmersmarket;
 DROP PROCEDURE item_bought;
 DELIMITER //
-
 CREATE PROCEDURE item_bought(
     IN bid INT,
     IN postingid INT
@@ -13,14 +12,14 @@ INSERT INTO buyer_to_posting VALUES (bid, postingid, curdate());
 END //
 DELIMITER ;
 
-call item_bought(1,2);
+-- call item_bought(1,2);
 
 select * from buyer_to_posting;
 
 -- BUYER WANTS TO SEE THEIR BUYING HISTORY
 
-DELIMITER //
 DROP PROCEDURE buyer_history;
+DELIMITER //
 CREATE PROCEDURE buyer_history(
     IN inbid INT
 )
@@ -37,16 +36,16 @@ DELIMITER ;
 
 call buyer_history(1);
 
--- BUYER WANTS TO SEE THEIR BUYING HISTORY
+-- FARMER WANTS TO SEE THEIR PRODUCE HISTORY
 
+DROP PROCEDURE farmer_history;
 DELIMITER //
-DROP PROCEDURE buyer_history;
-CREATE PROCEDURE buyer_history(
+CREATE PROCEDURE farmer_history(
     IN inbid INT
 )
 BEGIN
-SELECT date_sold AS date, quantity, CONCAT(first_name, ' ', last_name) AS seller, produce_name AS product, farm_name as farm
- FROM (SELECT * FROM buyer_to_posting WHERE bid = inbid) a
+SELECT pid, produce_name,  sid, CONCAT(first_name, ' ', last_name) AS seller
+	FROM (SELECT * FROM farm WHERE fid = inbid) a
 NATURAL JOIN posting
 NATURAL JOIN produce
 NATURAL JOIN seller
@@ -55,7 +54,7 @@ NATURAL JOIN farm;
 END //
 DELIMITER ;
 
-call buyer_history(1);
+call farmer_history(8);
 
 -- BUYER WANTS TO SEARCH FOR POSTINGS WITH FILTERS
 
@@ -184,4 +183,51 @@ select * from buyer_to_posting;
 Select Distinct farm_name from farm;
 SELECT Distinct CONCAT(first_name, " ", last_name) as seller_name FROM seller;
 Select Distinct produce_name from catalog;
+
+-- updates seller_to_farm table after a seller partners with a farmer
+
+DROP PROCEDURE farmer_partner;
+DELIMITER //
+CREATE PROCEDURE farmer_partner(
+    IN sid INT,
+    IN fid INT
+)
+BEGIN
+INSERT INTO seller_to_farm VALUES (sid, fid);
+END //
+DELIMITER ;
+
+-- deletes a posting
+
+DROP PROCEDURE delete_posting;
+DELIMITER //
+CREATE PROCEDURE delete_posting(
+	IN postid INT
+)
+BEGIN
+DELETE FROM posting WHERE postingid = postid;
+END //
+DELIMITER ;
+
+-- add a produce
+DROP PROCEDURE add_produce;
+DELIMITER //
+CREATE PROCEDURE add_produce(
+	IN quantityIN INT,
+    IN cidIN INT,
+    IN fidIN INT
+)
+DETERMINISTIC
+MODIFIES SQL DATA
+BEGIN
+    INSERT INTO produce
+    SET 
+    pid = DEFAULT,
+    quantity = quantityIN,
+    cid = cidIN,
+    fid = fidIN;
+END //
+DELIMITER ;
+
+call add_produce(12, 3, 3);
 
