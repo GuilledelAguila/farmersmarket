@@ -1,6 +1,7 @@
 -- USER ACTIONS:
 -- BUYER BUYS A CERTAIN POST:
 USE farmersmarket;
+DROP PROCEDURE item_bought;
 DELIMITER //
 
 CREATE PROCEDURE item_bought(
@@ -77,7 +78,7 @@ DECLARE price_filter VARCHAR(200);
 DECLARE not_sold VARCHAR(200);
 DECLARE count INT;
 SET @dynamic_sql = "
-    SELECT quantity, CONCAT(first_name, ' ', last_name) AS seller, produce_name AS product, farm_name as farm, cost, date_posted from posting
+    SELECT postingid, quantity, CONCAT(first_name, ' ', last_name) AS seller, produce_name AS product, farm_name as farm, cost, date_posted from posting
 		NATURAL JOIN produce
 		NATURAL JOIN seller
 		NATURAL JOIN catalog
@@ -157,6 +158,30 @@ END IF;
 END //
 DELIMITER ;
 
+SELECT postingid, CONCAT(first_name, ' ', last_name) AS seller, produce_name AS product, farm_name as farm, cost, date_posted from posting
+		NATURAL JOIN produce
+		NATURAL JOIN seller
+		NATURAL JOIN catalog
+		NATURAL JOIN farm
+        WHERE posting.postingid not in(SELECT DISTINCT postingid from buyer_to_posting);
+
 call search_post('Shrute', 'Barack Obama' ,NULL,NULL, NULL);
-call search_post(NULL, NULL ,NULL,NULL, NULL);
+call search_post(NULL, NULL ,'Beets',NULL, NULL);
+
+	    SELECT postingid, quantity, CONCAT(first_name, ' ', last_name) AS seller, produce_name AS product, farm_name as farm, cost, date_posted from posting
+			NATURAL JOIN produce
+			NATURAL JOIN seller
+			NATURAL JOIN catalog
+			NATURAL JOIN farm
+	        WHERE posting.postingid not in(SELECT DISTINCT postingid from buyer_to_posting)
+		 HAVING product = 'Beets';
+         
+call search_post('', '' ,'',NULL, NULL);
+CALL search_post(null, null , null, 1, 20);
+CALL search_post('Shrute', 'Adam Smith' , 'Beets', null, null);
+select * from buyer_to_posting;
+
+Select Distinct farm_name from farm;
+SELECT Distinct CONCAT(first_name, " ", last_name) as seller_name FROM seller;
+Select Distinct produce_name from catalog;
 
