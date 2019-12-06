@@ -60,7 +60,7 @@ public class Buyer {
 	JButton reviews_button = new JButton("View farm reviews");
 	JButton make_review_button = new JButton("Leave a Review");
 
-	
+	// get all available postings that can be bought at the current time with or without filters
 	public void getPostings(JTable table, GetTable modelTable, String farm, String seller, 
 			String product, int price_lower, int price_upper, Connection conn) {
 		
@@ -109,6 +109,7 @@ public class Buyer {
 		
 	}
 	
+	// insert bought item into buyer_to_posting table
 	public void item_bought(JTable table, GetTable modelTable, int buyer_id, int posting_id, Connection conn) {
 		
 		try {
@@ -125,6 +126,7 @@ public class Buyer {
 		
 	}
 	
+	//get the buyer history
 	public void buyer_history(JTable table, GetTable modelTable, int buyer_id, Connection conn) {
 		
 		try {
@@ -141,7 +143,7 @@ public class Buyer {
 	}
 	
 
-	
+	//get all farm reviews
 	public void get_reviews(JTable table, GetTable modelTable, Connection conn) {
 		
 		try {
@@ -156,6 +158,7 @@ public class Buyer {
 		
 	}
 	
+	//set all dropdowns with data for the filter area
 	public void set_filter_dropdowns(Connection conn) {
 		
 		
@@ -210,23 +213,27 @@ public class Buyer {
 
 	public void run(Connection conn, int id) throws SQLException {
 
-		
+		//configuring main frame
 		buyer_frame.setLayout(new BoxLayout(buyer_frame.getContentPane(), BoxLayout.Y_AXIS));
 		buyer_frame.setSize((int)screenWidth / 3, (int)screenHeight -650);
 		buyer_frame.setLocation(0, 0);
 		
+		//configuring panels that will go in the main frame
 		table_panel.setLayout(new FlowLayout());
 		filter_panel.setLayout(new FlowLayout());
 		history_panel.setLayout(new FlowLayout());
 		make_review_panel.setLayout(new FlowLayout());
 		
+		// adding buttons to allow user to see history, postings or reviews
 		history_panel.add(history_button);
 		history_panel.add(postings_button);
 		history_panel.add(reviews_button);
 		
+		//adding review button to review pannel
 		make_review_panel.add(make_review_button);
 		modelTable = new GetTable(conn);
 		
+		//adding all dropdowns to filtering area in frame
 		set_filter_dropdowns(conn);
 		JLabel label1 = new JLabel("Select Farm:");
 		filter_panel.add(label1);
@@ -247,11 +254,10 @@ public class Buyer {
 		filter_panel.add(filter_button);
 		
 		
-
-		// Makes posting table in the buyer window 
-		
+		// getting data into the available postings table "default view"
 		getPostings(mainTable, modelTable,  "--", "--", "--", -1, -1, conn);
 
+		//configuring main table in frame
 		JScrollPane mainTableContainer = new JScrollPane(mainTable);
 		mainTableContainer.setPreferredSize(new Dimension(622, 200));
 		filter_panel.setPreferredSize(new Dimension(622, 50));
@@ -262,40 +268,42 @@ public class Buyer {
 		table_panel.add(tittle,BorderLayout.PAGE_START);
 		table_panel.add(mainTableContainer);
 		
+		//adding all panel to the main frame
 		buyer_frame.getContentPane().add(history_panel);
 		buyer_frame.getContentPane().add(table_panel);
 		buyer_frame.getContentPane().add(filter_panel);
 
 		buyer_frame.getContentPane().add(make_review_panel);
 		
-
-		
-
-
 		buyer_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		// allows for selection of row from a table
+		
+		// Listen for row selection (item bought) in the postings table
 		mainTable.getSelectionModel().addListSelectionListener(new ListSelectionListener(){
 			public void valueChanged(ListSelectionEvent event) {
 
 				if (event.getValueIsAdjusting()){
 					if (mainTable.getSelectedRow() != -1 && tittle.getText() == "Available To Buy: Click on an item to buy") {
 						int selected_product_id = (int) mainTable.getValueAt(mainTable.getSelectedRow(), 0);
+						//update buyer_to_postings table
 						item_bought(mainTable, modelTable, id, selected_product_id, conn);
+						//refresh postings table
 						getPostings(mainTable, modelTable,  "--", "--", "--", -1, -1, conn);
 					}
 				}
 			}
 		});
 		
+		//listen for buyer wants to filter the postings table
         filter_button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+            	//get all filtered areas the user selected
             	String chosen_farm = (String)choose_farm.getSelectedItem();
             	String chosen_seller = (String)choose_seller.getSelectedItem();
             	String chosen_produce = (String)choose_product.getSelectedItem();
-            	
             	String chosen_price_upper;
             	String chosen_price_lower;
+            	
             	try {
             		chosen_price_upper  = (String)choose_upper.getSelectedItem();
             		chosen_price_upper = "-1";
@@ -310,15 +318,14 @@ public class Buyer {
             		 chosen_price_lower  = Integer.toString((int)choose_lower.getSelectedItem());
             	}
             	
-            	
- 
-            	
+            	//refresh table with new filtered data
             	getPostings(mainTable, modelTable,  chosen_farm, chosen_seller, chosen_produce,
             			(int) Integer.parseInt(chosen_price_lower), (int) Integer.parseInt(chosen_price_upper), conn);
                 tittle.setText("Farm Reviews");
             }
         });
         
+        //listen for when buyer wants to see shopping history
         history_button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -327,6 +334,7 @@ public class Buyer {
             }
         });
         
+        //listen for when thu buyer wants to look at postings (no filters)
         postings_button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -336,6 +344,7 @@ public class Buyer {
             }
         });
         
+        //listen for when the user wants to see all reviews
         reviews_button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -345,16 +354,18 @@ public class Buyer {
             }
         });
         
+        //listen for when the user wants to make a review
         make_review_button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            	
+            	//show reviews in main table
                 get_reviews(mainTable, modelTable, conn);
                 tittle.setText("Farm Reviews");
             	
+                //setup new window
             	JFrame review_frame = new JFrame("Review");
             	JPanel review_panel = new JPanel();
-            	JTextArea review_area = new JTextArea(10, 55);
+            	JTextArea review_area = new JTextArea(10, 50);
         		JLabel choose_farm_label = new JLabel("Choose Farm to Review:");
         		JButton submit_review_button = new JButton("Submit Review OR Delete Review (If Empty)");
             	
@@ -364,6 +375,7 @@ public class Buyer {
         		review_frame.setSize((int)screenWidth / 3, (int)screenHeight -800);
         		review_frame.setLocation(400,400);
         		
+        		//get all farms from which the buyer has bought before
         		try {
 					CallableStatement callGetFarms = conn.prepareCall("{CALL get_buyer_farms(?)}");
 					callGetFarms.setInt(1, id);
@@ -379,6 +391,7 @@ public class Buyer {
 					e1.printStackTrace();
 				}
         		
+        		//add all ui elements to the frame
         		review_panel.add(choose_farm_label);
         		review_panel.add(choose_farm_to_review);
         		review_panel.add(review_area);
@@ -388,6 +401,7 @@ public class Buyer {
         		review_frame.setVisible(true);
         		buyer_frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         		
+        		//listen for when the user submits the review
                 submit_review_button.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -396,7 +410,7 @@ public class Buyer {
                     	int farmid = 0;
                     	String review = review_area.getText();
 
-                    	
+                    	//get the farm id from the farm name the buyer selects
                 		try {
                 			String sql = "Select Distinct fid from farm where farm_name = ?;";
                 			PreparedStatement pstmt_get_id = conn.prepareStatement(sql);
@@ -413,8 +427,7 @@ public class Buyer {
                 			err.printStackTrace();
                 		}
                 		
-                		System.out.println(review);
-                		
+                		//insert/delete/update buyer review
                 		try {
 
                 			CallableStatement callSubmitReview = conn.prepareCall("{CALL insert_update_review(?,?,?)}");
@@ -450,11 +463,6 @@ public class Buyer {
         });
 
 		buyer_frame.setVisible(true);
-
-
-
-
-
 
 	}
 }
