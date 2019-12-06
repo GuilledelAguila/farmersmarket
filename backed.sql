@@ -3,6 +3,7 @@
 USE farmersmarket;
 DROP PROCEDURE item_bought;
 DELIMITER //
+
 CREATE PROCEDURE item_bought(
     IN bid INT,
     IN postingid INT
@@ -12,14 +13,54 @@ INSERT INTO buyer_to_posting VALUES (bid, postingid, curdate());
 END //
 DELIMITER ;
 
--- call item_bought(1,2);
+-- SEE FARM REVIEWS
+DROP PROCEDURE get_farm_reviews;
+DELIMITER //
+CREATE PROCEDURE get_farm_reviews(
+)
+BEGIN
+Select CONCAT(first_name, ' ', last_name) as Buyer, Review, farm_name as Farm, Location, Farmer from review NATURAL JOIN farm NATURAL JOIN buyer;
+END //
+DELIMITER ;
 
-select * from buyer_to_posting;
+-- GET FARMS FROM WHICH BUYER HAS BOUGHT
+DROP PROCEDURE get_buyer_farms;
+DELIMITER //
+CREATE PROCEDURE get_buyer_farms(
+    IN inbid INT
+)
+BEGIN
+Select DISTINCT farm_name as farm from (SELECT * FROM buyer_to_posting WHERE bid = inbid) as a
+	NATURAL JOIN posting
+    NATURAL JOIN produce
+    NATURAL JOIN farm;
+END //
+DELIMITER ;
+CALL get_buyer_farms(3);
+
+-- INSERT INTO OR UPDATE REVIEW
+DROP PROCEDURE insert_update_review;
+DELIMITER //
+CREATE PROCEDURE insert_update_review(
+    IN inbid INT,
+    IN infid INT,
+    IN review VARCHAR(250)
+)
+BEGIN
+IF review IS NULL THEN
+	DELETE FROM review where fid = infid and bid = inbid;
+ELSE 
+	INSERT INTO review VALUES(inbid, infid, review)  ON DUPLICATE KEY UPDATE    
+	review = review;
+	
+END IF;
+END //
+DELIMITER ;
+CALL insert_update_review(2, 2, "hi");
 
 -- BUYER WANTS TO SEE THEIR BUYING HISTORY
-
-DROP PROCEDURE buyer_history;
 DELIMITER //
+DROP PROCEDURE buyer_history;
 CREATE PROCEDURE buyer_history(
     IN inbid INT
 )
@@ -35,26 +76,6 @@ END //
 DELIMITER ;
 
 call buyer_history(1);
-
--- FARMER WANTS TO SEE THEIR PRODUCE HISTORY
-
-DROP PROCEDURE farmer_history;
-DELIMITER //
-CREATE PROCEDURE farmer_history(
-    IN inbid INT
-)
-BEGIN
-SELECT pid, produce_name,  sid, CONCAT(first_name, ' ', last_name) AS seller
-	FROM (SELECT * FROM farm WHERE fid = inbid) a
-NATURAL JOIN posting
-NATURAL JOIN produce
-NATURAL JOIN seller
-NATURAL JOIN catalog
-NATURAL JOIN farm;
-END //
-DELIMITER ;
-
-call farmer_history(8);
 
 -- BUYER WANTS TO SEARCH FOR POSTINGS WITH FILTERS
 
@@ -116,7 +137,7 @@ ELSE
             SET count = count + 1;
 		END IF;
 	END IF;
-	SELECT @dynamic_sql;
+
 	IF price_lower IS NOT NULL  AND price_upper IS NOT NULL THEN
 		SET price_filter = CONCAT(" cost BETWEEN ", price_lower, " AND ", price_upper);
 		IF  count > 0 THEN 
@@ -149,7 +170,6 @@ ELSE
             SET count = count + 1;
 		END IF; 
 	END IF;
-    SELECT @dynamic_sql;
 	PREPARE search_posting FROM @dynamic_sql;
 END IF;
     EXECUTE search_posting;
@@ -157,77 +177,22 @@ END IF;
 END //
 DELIMITER ;
 
-SELECT postingid, CONCAT(first_name, ' ', last_name) AS seller, produce_name AS product, farm_name as farm, cost, date_posted from posting
-		NATURAL JOIN produce
-		NATURAL JOIN seller
-		NATURAL JOIN catalog
-		NATURAL JOIN farm
-        WHERE posting.postingid not in(SELECT DISTINCT postingid from buyer_to_posting);
-
 call search_post('Shrute', 'Barack Obama' ,NULL,NULL, NULL);
-call search_post(NULL, NULL ,'Beets',NULL, NULL);
-
-	    SELECT postingid, quantity, CONCAT(first_name, ' ', last_name) AS seller, produce_name AS product, farm_name as farm, cost, date_posted from posting
-			NATURAL JOIN produce
-			NATURAL JOIN seller
-			NATURAL JOIN catalog
-			NATURAL JOIN farm
-	        WHERE posting.postingid not in(SELECT DISTINCT postingid from buyer_to_posting)
-		 HAVING product = 'Beets';
-         
+call search_post(NULL, NULL ,NULL,NULL, NULL);         
 call search_post('', '' ,'',NULL, NULL);
 CALL search_post(null, null , null, 1, 20);
-CALL search_post('Shrute', 'Adam Smith' , 'Beets', null, null);
+CALL search_post('Shrute', 'Adam Smith' , 'Beets', NULL, NULL);
 select * from buyer_to_posting;
 
 Select Distinct farm_name from farm;
 SELECT Distinct CONCAT(first_name, " ", last_name) as seller_name FROM seller;
 Select Distinct produce_name from catalog;
+Select review, farm_name as farm, location, farmer from review NATURAL JOIN farm;
+SELECT * FROM review;
+INSERT INTO review VALUES(2, 2, "complaints")  ON DUPLICATE KEY UPDATE    
+review ="complaints";
+Select Distinct fid from farm where farm_name = 'Doe';
+DELETE FROM review where fid = 2 and bid = 2;
 
--- updates seller_to_farm table after a seller partners with a farmer
-
-DROP PROCEDURE farmer_partner;
-DELIMITER //
-CREATE PROCEDURE farmer_partner(
-    IN sid INT,
-    IN fid INT
-)
-BEGIN
-INSERT INTO seller_to_farm VALUES (sid, fid);
-END //
-DELIMITER ;
-
--- deletes a posting
-
-DROP PROCEDURE delete_posting;
-DELIMITER //
-CREATE PROCEDURE delete_posting(
-	IN postid INT
-)
-BEGIN
-DELETE FROM posting WHERE postingid = postid;
-END //
-DELIMITER ;
-
--- add a produce
-DROP PROCEDURE add_produce;
-DELIMITER //
-CREATE PROCEDURE add_produce(
-	IN quantityIN INT,
-    IN cidIN INT,
-    IN fidIN INT
-)
-DETERMINISTIC
-MODIFIES SQL DATA
-BEGIN
-    INSERT INTO produce
-    SET 
-    pid = DEFAULT,
-    quantity = quantityIN,
-    cid = cidIN,
-    fid = fidIN;
-END //
-DELIMITER ;
-
-call add_produce(12, 3, 3);
+select * from buyer_to_posting;
 
