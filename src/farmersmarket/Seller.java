@@ -345,13 +345,14 @@ public class Seller {
            String courier_name = cc.getSelectedItem().toString();
            
            
-           CallableStatement callMakePosting = conn.prepareCall("{call make_posting(?, ?, ?)}");
+           CallableStatement callMakePosting = conn.prepareCall("{call make_posting(?, ?, ?, ?)}");
            
            // procedure to add the produce 
            try {
              callMakePosting.setInt(1, cost);
-             callMakePosting.setString(2, produce_name);
-             callMakePosting.setString(3, courier_name);
+             callMakePosting.setInt(2, id);
+             callMakePosting.setString(3, produce_name);
+             callMakePosting.setString(4, courier_name);
              callMakePosting.execute();
              
              ResultSet s = callMakePosting.executeQuery(query);
