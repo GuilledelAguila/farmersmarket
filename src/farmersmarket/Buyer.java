@@ -321,7 +321,7 @@ public class Buyer {
             	//refresh table with new filtered data
             	getPostings(mainTable, modelTable,  chosen_farm, chosen_seller, chosen_produce,
             			(int) Integer.parseInt(chosen_price_lower), (int) Integer.parseInt(chosen_price_upper), conn);
-                tittle.setText("Farm Reviews");
+                tittle.setText("Available To Buy: Click on an item to buy");
             }
         });
         
