@@ -72,13 +72,15 @@ public class Farmer {
 				panel.repaint();
 
 				// show reviews
-				String reviewQuery = "SELECT review, CONCAT(first_name, ' ', last_name) AS reviewer FROM (SELECT review, bid FROM review WHERE fid = " + id + ") as a NATURAL JOIN buyer WHERE buyer.bid = a.bid";
+
 
 				ArrayList<String> reviewsText = new ArrayList<String>();
 				ArrayList<String> whoSaid = new ArrayList<String>();
 
-				try(PreparedStatement ps = conn.prepareStatement(reviewQuery);
-						ResultSet rs = ps.executeQuery()) {
+				try {
+					PreparedStatement ps = conn.prepareStatement("{call get_reviews(?)}");
+					ps.setInt(1, id);
+					ResultSet rs = ps.executeQuery();
 					while(rs.next()) {
 						reviewsText.add(rs.getString("review"));
 						whoSaid.add(rs.getString("reviewer"));
@@ -122,7 +124,19 @@ public class Farmer {
 				panel.repaint();
 
 				GetTable farms = new GetTable(conn);
-				JTable farmTable = farms.runTable("SELECT postingid, produce_name, c.sid, CONCAT(first_name, ' ', last_name) AS seller_name FROM (SELECT postingid, produce_name, sid FROM (SELECT postingid, a.cid AS catalogid, sid FROM posting JOIN (SELECT pid, cid FROM produce WHERE fid = " + id + ") as a WHERE posting.pid = a.pid) as b JOIN catalog WHERE catalogid = catalog.cid) as c JOIN seller WHERE seller.sid = c.sid;");
+				JTable farmTable = new JTable();
+
+				try {
+					CallableStatement callFarmsPosting = conn.prepareCall("{call farms_postings(?)}");
+					callFarmsPosting.setInt(1, id);
+
+					ResultSet s = callFarmsPosting.executeQuery();
+					farmTable.setModel(farms.buildTableModel(s));
+
+				} catch (SQLException err) {
+					// TODO Auto-generated catch block
+					err.printStackTrace();
+				}
 
 				farmTable.setFillsViewportHeight(true);
 
@@ -169,9 +183,9 @@ public class Farmer {
 						try {
 							int quantity = Integer.parseInt(quantityTF.getText());
 							int cid = Integer.parseInt(cidTF.getText());
-							
+
 							CallableStatement callAddProduce = conn.prepareCall("{call add_produce(?, ?, ?)}");
-							
+
 							// procedure to add the produce 
 							try {
 								callAddProduce.setInt(1, quantity);
@@ -182,7 +196,7 @@ public class Farmer {
 								JLabel error = new JLabel("Invalid Data Entered Try Again");
 								quantityTF.setText(""); 
 								cidTF.setText(""); 
-								
+
 								panel.add(error);
 								farmer.add(panel);
 								panel.revalidate();
@@ -195,7 +209,7 @@ public class Farmer {
 							JLabel error = new JLabel("Invalid Data Entered Try Again");
 							quantityTF.setText(""); 
 							cidTF.setText(""); 
-							
+
 							panel.add(error);
 							farmer.add(panel);
 							panel.revalidate();
@@ -203,13 +217,13 @@ public class Farmer {
 						}
 
 
-						
+
 					}
 
 				});
 
 
-				
+
 				panel.add(quantityPrompt);
 				panel.add(quantityTF);
 				panel.add(cidPrompt);

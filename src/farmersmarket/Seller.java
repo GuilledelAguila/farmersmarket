@@ -343,7 +343,7 @@ public class Seller {
            Integer courid = (Integer) cc.getSelectedItem();
            
            
-           CallableStatement callMakePosting = conn.prepareCall("{call make_posting(?, ?, ?, ?)}");
+           CallableStatement callMakePosting = conn.prepareCall("{call add_posting(?, ?, ?, ?)}");
            
            // procedure to add the produce 
            try {

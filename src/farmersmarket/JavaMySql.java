@@ -26,7 +26,6 @@ public class JavaMySql {
 
 	/** The port of the MySQL server (default is 3306) */
 	private final int portNumber = 3306;
-
 	/** The name of the database we are testing with (this default is installed with MySQL) */
 	private final String dbName = "farmersmarket";
 
