@@ -3,6 +3,7 @@ package farmersmarket;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Vector;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -20,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -236,7 +239,7 @@ public class Seller {
 
        JLabel lblHeadingFarmers = new JLabel("Current Postings (click to delete)");
      
-       catalogFrame.getContentPane().setLayout(new BorderLayout());
+       catalogFrame.getContentPane().setLayout(new FlowLayout());
        
        catalogFrame.add(lblHeadingFarmers,BorderLayout.CENTER);
        catalogFrame.add(scrollPaneFarmers, BorderLayout.CENTER);
@@ -282,6 +285,105 @@ public class Seller {
            }
          }
        });
+       
+       JLabel headingMakePost = new JLabel("Make Post: ");
+       JPanel panel = new JPanel();
+       panel.setLayout(new FlowLayout());
+       panel.add(headingMakePost);
+       
+    // Dropdown for produce
+       String produceQuery = "select produce_name from catalog";
+       Vector<String> produce = new Vector<String>();
+       
+       try(PreparedStatement ps = conn.prepareStatement(produceQuery);
+           ResultSet rs = ps.executeQuery()) {
+         while(rs.next()) {
+           produce.add(rs.getString("produce_name"));
+         }
+       } catch (SQLException e) {
+         System.out.println(e.getMessage());
+       }
+       
+       final JComboBox<String> cb = new JComboBox<String>(produce);
+       cb.setMinimumSize(cb.getMinimumSize());
+       // cb.setAlignmentX(Component.RIGHT_ALIGNMENT);
+       panel.add(cb);
+       
+    // Dropdown for courier
+       String courierQuery = "select courier_name from courier";
+       Vector<String> courier = new Vector<String>();
+       
+       try(PreparedStatement ps2 = conn.prepareStatement(courierQuery);
+           ResultSet rs2 = ps2.executeQuery()) {
+         while(rs2.next()) {
+           courier.add(rs2.getString("courier_name"));
+         }
+       } catch (SQLException e) {
+         System.out.println(e.getMessage());
+       }
+       
+    // Dropdown for courier
+       final JComboBox<String> cc = new JComboBox<String>(courier);
+       cb.setMinimumSize(cc.getMinimumSize());
+      //  cb.setAlignmentX(Component.CENTER_ALIGNMENT);
+       panel.add(cc);
+       
+    // textbox for cost
+       JTextField costTF = new JTextField(10);
+       costTF.setText("Enter cost here");
+
+       panel.add(costTF);
+       
+    // Add Enter Button
+       JButton enter = new JButton("Enter");
+
+       enter.addActionListener(new ActionListener() {
+         public void actionPerformed(ActionEvent e) {
+         try {
+           int cost = Integer.parseInt(costTF.getText());
+           String produce_name = cb.getSelectedItem().toString();
+           String courier_name = cc.getSelectedItem().toString();
+           
+           
+           CallableStatement callMakePosting = conn.prepareCall("{call make_posting(?, ?, ?)}");
+           
+           // procedure to add the produce 
+           try {
+             callMakePosting.setInt(1, cost);
+             callMakePosting.setString(2, produce_name);
+             callMakePosting.setString(3, courier_name);
+             callMakePosting.execute();
+             
+             ResultSet s = callMakePosting.executeQuery(query);
+             farmersTable.setModel(farmers.buildTableModel(s));
+             
+           } catch (SQLException e1) {
+             JLabel error = new JLabel("Invalid Data Entered Try Again");
+             error.setSize(10, 10);
+             costTF.setText(""); 
+             
+             panel.add(error);
+             panel.revalidate();
+             panel.repaint();
+           }
+
+           costTF.setText(""); 
+
+         } catch (NumberFormatException | SQLException n) {
+           JLabel error = new JLabel("Invalid Data Entered Try Again");
+           costTF.setText(""); 
+           
+           panel.add(error);
+           panel.revalidate();
+           panel.repaint();
+     
+         }
+          
+        }
+       });
+       
+   panel.add(enter);
+   catalogFrame.add(panel, BorderLayout.SOUTH);
        
    catalogFrame.setVisible(true);
  }
