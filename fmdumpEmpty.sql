@@ -39,7 +39,6 @@ CREATE TABLE `buyer` (
 
 LOCK TABLES `buyer` WRITE;
 /*!40000 ALTER TABLE `buyer` DISABLE KEYS */;
-INSERT INTO `buyer` VALUES (1,'Hans','Zimmer','1 Blueberry Ave'),(2,'George','Lucas','66 Sith St'),(3,'Nick','Harper','4 Main St'),(4,'Angel','Murphy','55 Rainbow Rd'),(5,'Dorothy','Brinker','17 Huntington Ave'),(6,'Penny','Wise','5 Gutter Lane'),(7,'Vito','Corleone','75 Parker Rd'),(8,'Travis ','Bickle','2 Taxi Drive'),(9,'Bruce','Wayne','45 Gotham St'),(10,'Lois','Lane','3 Lois Lane');
 /*!40000 ALTER TABLE `buyer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -56,9 +55,8 @@ CREATE TABLE `buyer_to_posting` (
   `date_sold` date NOT NULL,
   PRIMARY KEY (`bid`,`postingid`),
   UNIQUE KEY `postingid` (`postingid`),
-  KEY `buyer_to_posting_fk_posting` (`postingid`),
-  CONSTRAINT `buyer_to_posting_fk_buyer` FOREIGN KEY (`bid`) REFERENCES `buyer` (`bid`) ON DELETE RESTRICT,
-  CONSTRAINT `buyer_to_posting_fk_posting` FOREIGN KEY (`postingid`) REFERENCES `posting` (`postingid`) ON DELETE RESTRICT
+  CONSTRAINT `buyer_to_posting_fk_buyer` FOREIGN KEY (`bid`) REFERENCES `buyer` (`bid`),
+  CONSTRAINT `buyer_to_posting_fk_posting` FOREIGN KEY (`postingid`) REFERENCES `posting` (`postingid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -68,7 +66,6 @@ CREATE TABLE `buyer_to_posting` (
 
 LOCK TABLES `buyer_to_posting` WRITE;
 /*!40000 ALTER TABLE `buyer_to_posting` DISABLE KEYS */;
-INSERT INTO `buyer_to_posting` VALUES (1,1,'2019-11-10'),(2,2,'2019-11-11'),(3,3,'2019-11-12'),(4,4,'2019-11-13'),(5,5,'2019-11-14');
 /*!40000 ALTER TABLE `buyer_to_posting` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -92,7 +89,6 @@ CREATE TABLE `catalog` (
 
 LOCK TABLES `catalog` WRITE;
 /*!40000 ALTER TABLE `catalog` DISABLE KEYS */;
-INSERT INTO `catalog` VALUES (1,'Potatoes'),(2,'Corn'),(3,'Eggs'),(4,'Apples'),(5,'Beets'),(6,'Tomatoes'),(7,'Yams'),(8,'Carrots'),(9,'Watermelon'),(10,'wheat');
 /*!40000 ALTER TABLE `catalog` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -118,7 +114,6 @@ CREATE TABLE `courier` (
 
 LOCK TABLES `courier` WRITE;
 /*!40000 ALTER TABLE `courier` DISABLE KEYS */;
-INSERT INTO `courier` VALUES (1,'Fedex','Express',11),(2,'UPS','Standard',6),(3,'USPS','Standard',3),(4,'Prime','Express',8),(5,'DHL','Standard',5);
 /*!40000 ALTER TABLE `courier` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -135,7 +130,7 @@ CREATE TABLE `farm` (
   `location` varchar(50) NOT NULL,
   `farmer` varchar(50) NOT NULL,
   PRIMARY KEY (`fid`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -144,7 +139,6 @@ CREATE TABLE `farm` (
 
 LOCK TABLES `farm` WRITE;
 /*!40000 ALTER TABLE `farm` DISABLE KEYS */;
-INSERT INTO `farm` VALUES (1,'Smith','Hudson, NH','Adam Smith'),(2,'McDonald','Philadelphia, PA','Ronald McDonald'),(3,'Eastie','Boston, MA','Bob Parker'),(4,'Doe','Dallas, TX','John Doe'),(5,'Superior','Boston, MA','Raymond Smith'),(6,'Creek','Templeton, CA','Jack Creek'),(7,'Cherry Crest','Ronks, PA','Bilbo Baggins'),(8,'Snow','Winterfell, Westeros','Jon Snow'),(9,'Allandale','Chestnut Hill, MA','Alan Dale'),(10,'Shrute','Scranton, PA','Dwight Shrute');
 /*!40000 ALTER TABLE `farm` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -163,12 +157,12 @@ CREATE TABLE `posting` (
   `cost` decimal(10,0) NOT NULL,
   `date_posted` date NOT NULL,
   PRIMARY KEY (`postingid`),
-  UNIQUE KEY `unique_sid_pid` (`sid`,`pid`),
+  KEY `posting_fk_seller` (`sid`),
   KEY `posting_fk_produce` (`pid`),
   KEY `posting_fk_courier` (`courid`),
-  CONSTRAINT `posting_fk_courier` FOREIGN KEY (`courid`) REFERENCES `courier` (`courid`) ON DELETE RESTRICT,
-  CONSTRAINT `posting_fk_produce` FOREIGN KEY (`pid`) REFERENCES `produce` (`pid`) ON DELETE RESTRICT,
-  CONSTRAINT `posting_fk_seller` FOREIGN KEY (`sid`) REFERENCES `seller` (`sid`) ON DELETE RESTRICT
+  CONSTRAINT `posting_fk_courier` FOREIGN KEY (`courid`) REFERENCES `courier` (`courid`),
+  CONSTRAINT `posting_fk_produce` FOREIGN KEY (`pid`) REFERENCES `produce` (`pid`),
+  CONSTRAINT `posting_fk_seller` FOREIGN KEY (`sid`) REFERENCES `seller` (`sid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -178,7 +172,6 @@ CREATE TABLE `posting` (
 
 LOCK TABLES `posting` WRITE;
 /*!40000 ALTER TABLE `posting` DISABLE KEYS */;
-INSERT INTO `posting` VALUES (1,3,1,3,10,'2019-10-11'),(2,2,2,3,21,'2019-10-12'),(3,1,3,1,20,'2019-10-13'),(4,3,4,2,16,'2019-10-16'),(5,5,5,5,12,'2019-10-17'),(6,6,6,1,12,'2019-10-18'),(7,4,7,4,38,'2019-10-19'),(8,4,8,4,6,'2019-10-19'),(9,4,9,5,3,'2019-10-24'),(10,1,1,2,11,'2019-10-11');
 /*!40000 ALTER TABLE `posting` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -190,16 +183,16 @@ DROP TABLE IF EXISTS `produce`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `produce` (
-  `pid` int(11) NOT NULL AUTO_INCREMENT,
+  `pid` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
   `cid` int(11) NOT NULL,
   `fid` int(11) NOT NULL,
   PRIMARY KEY (`pid`),
   KEY `produce_fk_catalog` (`cid`),
   KEY `produce_fk_farm` (`fid`),
-  CONSTRAINT `produce_fk_catalog` FOREIGN KEY (`cid`) REFERENCES `catalog` (`cid`) ON DELETE RESTRICT,
-  CONSTRAINT `produce_fk_farm` FOREIGN KEY (`fid`) REFERENCES `farm` (`fid`) ON DELETE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `produce_fk_catalog` FOREIGN KEY (`cid`) REFERENCES `catalog` (`cid`),
+  CONSTRAINT `produce_fk_farm` FOREIGN KEY (`fid`) REFERENCES `farm` (`fid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -208,7 +201,6 @@ CREATE TABLE `produce` (
 
 LOCK TABLES `produce` WRITE;
 /*!40000 ALTER TABLE `produce` DISABLE KEYS */;
-INSERT INTO `produce` VALUES (1,15,5,10),(2,2,2,1),(3,1,3,2),(4,2,4,3),(5,1,1,4),(6,1,9,6),(7,5,8,4),(8,10,7,4),(9,5,7,4),(10,12,3,3);
 /*!40000 ALTER TABLE `produce` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -224,10 +216,9 @@ CREATE TABLE `review` (
   `fid` int(11) NOT NULL,
   `review` varchar(250) NOT NULL,
   PRIMARY KEY (`bid`,`fid`),
-  KEY `review_fk_buyer` (`bid`),
   KEY `review_fk_farm` (`fid`),
-  CONSTRAINT `review_fk_buyer` FOREIGN KEY (`bid`) REFERENCES `buyer` (`bid`) ON DELETE RESTRICT,
-  CONSTRAINT `review_fk_farm` FOREIGN KEY (`fid`) REFERENCES `farm` (`fid`) ON DELETE RESTRICT
+  CONSTRAINT `review_fk_buyer` FOREIGN KEY (`bid`) REFERENCES `buyer` (`bid`),
+  CONSTRAINT `review_fk_farm` FOREIGN KEY (`fid`) REFERENCES `farm` (`fid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -237,7 +228,6 @@ CREATE TABLE `review` (
 
 LOCK TABLES `review` WRITE;
 /*!40000 ALTER TABLE `review` DISABLE KEYS */;
-INSERT INTO `review` VALUES (1,5,'Love it!'),(3,4,'Gross :('),(4,8,'Excellent Products!');
 /*!40000 ALTER TABLE `review` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -253,7 +243,7 @@ CREATE TABLE `seller` (
   `first_name` varchar(50) NOT NULL,
   `last_name` varchar(50) NOT NULL,
   PRIMARY KEY (`sid`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -262,7 +252,6 @@ CREATE TABLE `seller` (
 
 LOCK TABLES `seller` WRITE;
 /*!40000 ALTER TABLE `seller` DISABLE KEYS */;
-INSERT INTO `seller` VALUES (1,'Adam','Smith'),(2,'John','Johnson'),(3,'Barack','Obama'),(4,'Robert','Plant'),(5,'Tom','Baker'),(6,'Harry','Jones'),(7,'Andre','Yan'),(8,'Frodo','Bolson'),(9,'Noah','Gordon');
 /*!40000 ALTER TABLE `seller` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -289,7 +278,6 @@ CREATE TABLE `seller_to_farm` (
 
 LOCK TABLES `seller_to_farm` WRITE;
 /*!40000 ALTER TABLE `seller_to_farm` DISABLE KEYS */;
-INSERT INTO `seller_to_farm` VALUES (1,1),(2,1),(2,2),(1,3),(3,3),(4,4),(5,4),(6,5),(7,7),(3,8),(8,8),(9,9),(1,10),(3,10);
 /*!40000 ALTER TABLE `seller_to_farm` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -608,4 +596,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2019-12-06 15:26:29
+-- Dump completed on 2019-12-06 15:41:50
