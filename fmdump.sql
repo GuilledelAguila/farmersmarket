@@ -309,8 +309,8 @@ DELIMITER ;;
 CREATE DEFINER=`root`@`localhost` PROCEDURE `add_posting`(
 	IN costIN INT,
     IN sidIN INT,
-    IN produce_nameIN VARCHAR(50),
-    IN courier_nameIN VARCHAR(50)
+    IN pidIN INT,
+    IN cidIN INT
 )
     MODIFIES SQL DATA
     DETERMINISTIC
