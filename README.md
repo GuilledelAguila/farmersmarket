@@ -4,7 +4,7 @@ A marketplace to connect buyers, seller, and farmers of fresh local produce.
 ## Installation
 
 Running the Database:
-
+1. Execute fmdump.sql
 
 Installing JDBC:
 1. Download the MySQL Connector/J (current version 8.0.18): https://dev.mysql.com/downloads/connector/j/
