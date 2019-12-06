@@ -156,7 +156,7 @@ DROP TABLE IF EXISTS `posting`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `posting` (
-  `postingid` int(11) NOT NULL,
+  `postingid` int(11) NOT NULL auto_increment,
   `sid` int(11) NOT NULL,
   `pid` int(11) NOT NULL,
   `courid` int(11) NOT NULL,
@@ -316,13 +316,8 @@ CREATE DEFINER=`root`@`localhost` PROCEDURE `add_posting`(
     DETERMINISTIC
 BEGIN
 
-    INSERT INTO produce
-    SET 
-    postingid = DEFAULT,
-    sid = sidIN,
-    cost = costIN,
-    pid = pidIN,
-    cid = cidIN;
+INSERT INTO posting values(DEFAULT, sidIN, pidIN, cidIN, costIN, curdate()); 
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
