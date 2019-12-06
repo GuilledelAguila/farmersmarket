@@ -286,19 +286,19 @@ public class Seller {
          }
        });
        
-       JLabel headingMakePost = new JLabel("Make Post (cid, courid, cost): ");
+       JLabel headingMakePost = new JLabel("Make Post (pid, courid, cost): ");
        JPanel panel = new JPanel();
        panel.setLayout(new FlowLayout());
        panel.add(headingMakePost);
        
     // Dropdown for produce
-       String produceQuery = "select cid from catalog";
+       String produceQuery = "select pid from produce";
        Vector<Integer> produce = new Vector<Integer>();
        
        try(PreparedStatement ps = conn.prepareStatement(produceQuery);
            ResultSet rs = ps.executeQuery()) {
          while(rs.next()) {
-           produce.add(rs.getInt("cid"));
+           produce.add(rs.getInt("pid"));
          }
        } catch (SQLException e) {
          System.out.println(e.getMessage());
@@ -339,7 +339,7 @@ public class Seller {
          public void actionPerformed(ActionEvent e) {
          try {
            int cost = Integer.parseInt(costTF.getText());
-           Integer cid = (Integer) cb.getSelectedItem();
+           Integer pid = (Integer) cb.getSelectedItem();
            Integer courid = (Integer) cc.getSelectedItem();
            
            
@@ -349,7 +349,7 @@ public class Seller {
            try {
              callMakePosting.setInt(1, cost);
              callMakePosting.setInt(2, id);
-             callMakePosting.setInt(3, cid);
+             callMakePosting.setInt(3, pid);
              callMakePosting.setInt(4, courid);
              callMakePosting.execute();
              
