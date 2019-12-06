@@ -286,46 +286,44 @@ public class Seller {
          }
        });
        
-       JLabel headingMakePost = new JLabel("Make Post: ");
+       JLabel headingMakePost = new JLabel("Make Post (cid, courid, cost): ");
        JPanel panel = new JPanel();
        panel.setLayout(new FlowLayout());
        panel.add(headingMakePost);
        
     // Dropdown for produce
-       String produceQuery = "select produce_name from catalog";
-       Vector<String> produce = new Vector<String>();
+       String produceQuery = "select cid from catalog";
+       Vector<Integer> produce = new Vector<Integer>();
        
        try(PreparedStatement ps = conn.prepareStatement(produceQuery);
            ResultSet rs = ps.executeQuery()) {
          while(rs.next()) {
-           produce.add(rs.getString("produce_name"));
+           produce.add(rs.getInt("cid"));
          }
        } catch (SQLException e) {
          System.out.println(e.getMessage());
        }
        
-       final JComboBox<String> cb = new JComboBox<String>(produce);
+       final JComboBox<Integer> cb = new JComboBox<Integer>(produce);
        cb.setMinimumSize(cb.getMinimumSize());
-       // cb.setAlignmentX(Component.RIGHT_ALIGNMENT);
        panel.add(cb);
        
     // Dropdown for courier
-       String courierQuery = "select courier_name from courier";
-       Vector<String> courier = new Vector<String>();
+       String courierQuery = "select courid from courier";
+       Vector<Integer> courier = new Vector<Integer>();
        
        try(PreparedStatement ps2 = conn.prepareStatement(courierQuery);
            ResultSet rs2 = ps2.executeQuery()) {
          while(rs2.next()) {
-           courier.add(rs2.getString("courier_name"));
+           courier.add(rs2.getInt("courid"));
          }
        } catch (SQLException e) {
          System.out.println(e.getMessage());
        }
        
     // Dropdown for courier
-       final JComboBox<String> cc = new JComboBox<String>(courier);
+       final JComboBox<Integer> cc = new JComboBox<Integer>(courier);
        cb.setMinimumSize(cc.getMinimumSize());
-      //  cb.setAlignmentX(Component.CENTER_ALIGNMENT);
        panel.add(cc);
        
     // textbox for cost
@@ -341,8 +339,8 @@ public class Seller {
          public void actionPerformed(ActionEvent e) {
          try {
            int cost = Integer.parseInt(costTF.getText());
-           String produce_name = cb.getSelectedItem().toString();
-           String courier_name = cc.getSelectedItem().toString();
+           Integer cid = (Integer) cb.getSelectedItem();
+           Integer courid = (Integer) cc.getSelectedItem();
            
            
            CallableStatement callMakePosting = conn.prepareCall("{call make_posting(?, ?, ?, ?)}");
@@ -351,15 +349,15 @@ public class Seller {
            try {
              callMakePosting.setInt(1, cost);
              callMakePosting.setInt(2, id);
-             callMakePosting.setString(3, produce_name);
-             callMakePosting.setString(4, courier_name);
+             callMakePosting.setInt(3, cid);
+             callMakePosting.setInt(4, courid);
              callMakePosting.execute();
              
              ResultSet s = callMakePosting.executeQuery(query);
              farmersTable.setModel(farmers.buildTableModel(s));
              
            } catch (SQLException e1) {
-             JLabel error = new JLabel("Invalid Data Entered Try Again");
+             JLabel error = new JLabel("Error Try Again");
              error.setSize(10, 10);
              costTF.setText(""); 
              
@@ -371,7 +369,7 @@ public class Seller {
            costTF.setText(""); 
 
          } catch (NumberFormatException | SQLException n) {
-           JLabel error = new JLabel("Invalid Data Entered Try Again");
+           JLabel error = new JLabel("Error Try Again");
            costTF.setText(""); 
            
            panel.add(error);
