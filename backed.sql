@@ -1,7 +1,7 @@
 -- USER ACTIONS:
 -- BUYER BUYS A CERTAIN POST:
 USE farmersmarket;
-DROP PROCEDURE item_bought;
+-- DROP PROCEDURE item_bought;
 DELIMITER //
 CREATE PROCEDURE item_bought(
     IN bid INT,
@@ -18,7 +18,7 @@ select * from buyer_to_posting;
 
 -- BUYER WANTS TO SEE THEIR BUYING HISTORY
 
-DROP PROCEDURE buyer_history;
+-- DROP PROCEDURE buyer_history;
 DELIMITER //
 CREATE PROCEDURE buyer_history(
     IN inbid INT
@@ -38,7 +38,7 @@ call buyer_history(1);
 
 -- FARMER WANTS TO SEE THEIR PRODUCE HISTORY
 
-DROP PROCEDURE farmer_history;
+-- DROP PROCEDURE farmer_history;
 DELIMITER //
 CREATE PROCEDURE farmer_history(
     IN inbid INT
@@ -59,7 +59,7 @@ call farmer_history(8);
 -- BUYER WANTS TO SEARCH FOR POSTINGS WITH FILTERS
 
 
-DROP PROCEDURE search_post;
+-- DROP PROCEDURE search_post;
 DELIMITER //
 
 CREATE PROCEDURE search_post(
@@ -186,7 +186,7 @@ Select Distinct produce_name from catalog;
 
 -- updates seller_to_farm table after a seller partners with a farmer
 
-DROP PROCEDURE farmer_partner;
+-- DROP PROCEDURE farmer_partner;
 DELIMITER //
 CREATE PROCEDURE farmer_partner(
     IN sid INT,
@@ -199,7 +199,7 @@ DELIMITER ;
 
 -- deletes a posting
 
-DROP PROCEDURE delete_posting;
+-- DROP PROCEDURE delete_posting;
 DELIMITER //
 CREATE PROCEDURE delete_posting(
 	IN postid INT
@@ -210,7 +210,7 @@ END //
 DELIMITER ;
 
 -- add a produce
-DROP PROCEDURE add_produce;
+-- DROP PROCEDURE add_produce;
 DELIMITER //
 CREATE PROCEDURE add_produce(
 	IN quantityIN INT,
