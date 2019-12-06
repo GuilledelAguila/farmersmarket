@@ -55,6 +55,7 @@ CREATE TABLE `buyer_to_posting` (
   `postingid` int(11) NOT NULL,
   `date_sold` date NOT NULL,
   PRIMARY KEY (`bid`,`postingid`),
+  UNIQUE (`postingid`),
   KEY `buyer_to_posting_fk_posting` (`postingid`),
   CONSTRAINT `buyer_to_posting_fk_buyer` FOREIGN KEY (`bid`) REFERENCES `buyer` (`bid`) ON DELETE RESTRICT,
   CONSTRAINT `buyer_to_posting_fk_posting` FOREIGN KEY (`postingid`) REFERENCES `posting` (`postingid`) ON DELETE RESTRICT
@@ -189,7 +190,7 @@ DROP TABLE IF EXISTS `produce`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `produce` (
-  `pid` int(11) NOT NULL AUTO_INCREMENT,
+  `pid` int(11) NOT NULL,
   `quantity` int(11) NOT NULL,
   `cid` int(11) NOT NULL,
   `fid` int(11) NOT NULL,
@@ -219,11 +220,10 @@ DROP TABLE IF EXISTS `review`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `review` (
-  `rid` int(11) NOT NULL AUTO_INCREMENT,
   `bid` int(11) NOT NULL,
   `fid` int(11) NOT NULL,
   `review` varchar(250) NOT NULL,
-  PRIMARY KEY (`rid`),
+  PRIMARY KEY (`bid`,`fid`),
   KEY `review_fk_buyer` (`bid`),
   KEY `review_fk_farm` (`fid`),
   CONSTRAINT `review_fk_buyer` FOREIGN KEY (`bid`) REFERENCES `buyer` (`bid`) ON DELETE RESTRICT,
@@ -237,7 +237,7 @@ CREATE TABLE `review` (
 
 LOCK TABLES `review` WRITE;
 /*!40000 ALTER TABLE `review` DISABLE KEYS */;
-INSERT INTO `review` VALUES (1,4,8,'Excellent Products!'),(2,3,4,'Gross :('),(3,1,5,'Love it!'),(4,2,2,'No complaints');
+INSERT INTO `review` VALUES (4,8,'Excellent Products!'),(3,4,'Gross :('),(1,5,'Love it!'),(2,2,'No complaints');
 /*!40000 ALTER TABLE `review` ENABLE KEYS */;
 UNLOCK TABLES;
 

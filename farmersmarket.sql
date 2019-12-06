@@ -79,7 +79,7 @@ CREATE TABLE posting (
 
 CREATE TABLE buyer_to_posting (
     bid INT NOT NULL,
-    postingid INT NOT NULL,
+    postingid INT NOT NULL UNIQUE,
     date_sold DATE NOT NULL,
     CONSTRAINT PRIMARY KEY (bid , postingid),
     CONSTRAINT buyer_to_posting_fk_buyer FOREIGN KEY (bid)
@@ -89,10 +89,10 @@ CREATE TABLE buyer_to_posting (
 );
 
 CREATE TABLE review (
-    rid INT PRIMARY KEY AUTO_INCREMENT,
     bid INT NOT NULL,
     fid INT NOT NULL,
     review VARCHAR(250) NOT NULL,
+    CONSTRAINT PRIMARY KEY (bif, fid),
     CONSTRAINT review_fk_buyer FOREIGN KEY (bid)
         REFERENCES buyer (bid),
     CONSTRAINT review_fk_farm FOREIGN KEY (fid)

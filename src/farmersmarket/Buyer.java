@@ -257,7 +257,7 @@ public class Buyer {
 		filter_panel.setPreferredSize(new Dimension(622, 50));
 		mainTable.setFillsViewportHeight(true);
 		
-		JLabel tittle = new JLabel("Available To Buy");
+		JLabel tittle = new JLabel("Available To Buy: Click on an item to buy");
 		
 		table_panel.add(tittle,BorderLayout.PAGE_START);
 		table_panel.add(mainTableContainer);
@@ -278,7 +278,7 @@ public class Buyer {
 			public void valueChanged(ListSelectionEvent event) {
 
 				if (event.getValueIsAdjusting()){
-					if (mainTable.getSelectedRow() != -1) {
+					if (mainTable.getSelectedRow() != -1 && tittle.getText() == "Available To Buy: Click on an item to buy") {
 						int selected_product_id = (int) mainTable.getValueAt(mainTable.getSelectedRow(), 0);
 						item_bought(mainTable, modelTable, id, selected_product_id, conn);
 						getPostings(mainTable, modelTable,  "--", "--", "--", -1, -1, conn);
@@ -331,7 +331,7 @@ public class Buyer {
             @Override
             public void actionPerformed(ActionEvent e) {
             getPostings(mainTable, modelTable,  "--", "--", "--", -1, -1, conn);
-            tittle.setText("Available To Buy");
+            tittle.setText("Available To Buy: Click on an item to buy");
 
             }
         });
@@ -368,6 +368,7 @@ public class Buyer {
 					CallableStatement callGetFarms = conn.prepareCall("{CALL get_buyer_farms(?)}");
 					callGetFarms.setInt(1, id);
 					ResultSet s = callGetFarms.executeQuery();
+					choose_farm_to_review.removeAllItems();
 					while(s.next()) {
 						choose_farm_to_review.addItem(s.getString("farm"));
 					}
