@@ -320,10 +320,5 @@ public class fmgui extends JFrame {
 
 		// run login
 		display.runStartWindow(conn);
-		
-		// for testing farmer
-//		Farmer f = new Farmer();
-//		f.run(conn, 4);
-
 	}
 }
