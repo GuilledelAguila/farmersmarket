@@ -292,7 +292,7 @@ public class Seller {
        panel.add(headingMakePost);
        
     // Dropdown for produce
-       String produceQuery = "select pid from (select pid from produce where fid in (select fid from seller_to_farm where sid = " + id + ")) as c";
+       String produceQuery = "select distinct pid from posting where postingid not in (select postingid from buyer_to_posting)";
        Vector<Integer> produce = new Vector<Integer>();
        
        try(PreparedStatement ps = conn.prepareStatement(produceQuery);
@@ -357,7 +357,7 @@ public class Seller {
              farmersTable.setModel(farmers.buildTableModel(s));
              
            } catch (SQLException e1) {
-             JLabel error = new JLabel("Error");
+             JLabel error = new JLabel("Error: invalid pid");
              error.setSize(10, 10);
              costTF.setText(""); 
              
